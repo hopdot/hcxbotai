@@ -31,7 +31,23 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
-        run: |#!/bin/bash -eo pipefail
-next_steps.sh
+        run: |<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hcoinx Governance</title>
+</head>
+<body>
+    <h1>Welcome to Hcoinx</h1>
+    <p>Creator and Founder: Howard Mosely Jr.</p>
+    <p>Email: <a href="mailto:inchcoinx@outlook.com">inchcoinx@outlook.com</a></p>
+
+    <!-- Other HTML elements related to governance can be added here -->
+</body>
+</html>
+
           echo Add other actions to build,
           echo test, and deploy your project.
