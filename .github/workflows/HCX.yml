@@ -1,5 +1,149 @@
 # This workflow will build and push a node.js application to an Azure Web App when there is a push to the master branch.
-#
+#from zipfile import ZipFile
+import os
+
+# Create the folder structure and files for the MetaMask login widget
+project_name = "metamask-login-hcoinx"
+os.makedirs(project_name, exist_ok=True)
+
+# index.html content
+index_html = """<!DOCTYPE html>
+<html>
+<head>
+  <title>HcoinX MetaMask Login</title>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #222;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #fb8c00;
+    }
+    #wallet-address {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Connect MetaMask Wallet</h1>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <div id="wallet-address"></div>
+
+  <script>
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('Please install MetaMask to use this feature.');
+        return;
+      }
+
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+        document.getElementById('wallet-address').textContent = "Wallet: " + address;
+      } catch (err) {
+        console.error(err);
+        alert('Failed to connect wallet.');
+      }
+    }
+  </script>
+
+</body>
+</html>
+"""
+
+# README.md content
+readme_md = """# HcoinX MetaMask Login Widget
+
+A simple HTML app to connect MetaMask and display the user's Ethereum address. Designed for integration with [hcoinx.inc.wixsite.com](https://hcoinx.inc.wixsite.com).
+
+## Features
+
+- 🔐 MetaMask login
+- 💳 Display connected wallet address
+- ⚡ Built with ethers.js
+
+## How to Use
+
+1. Upload to GitHub
+2. Enable GitHub Pages on your repo (from `Settings > Pages`)
+3. Embed the public link in your Wix site using an iframe
+
+## Hosted Demo
+
+Coming soon...
+
+## Contact
+
+Built by [@hopdot](https://github.com/hopdot)  
+Email: gmo.hc93@gmail.com  
+"""
+
+# GitHub Actions YML (for GitHub Pages deployment)
+github_actions_yml = """name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+"""
+
+# Create the files in the directory
+with open(f"{project_name}/index.html", "w") as f:
+    f.write(index_html)
+
+with open(f"{project_name}/README.md", "w") as f:
+    f.write(readme_md)
+
+os.makedirs(f"{project_name}/.github/workflows", exist_ok=True)
+with open(f"{project_name}/.github/workflows/deploy.yml", "w") as f:
+    f.write(github_actions_yml)
+
+# Create a ZIP file of the project
+zip_path = f"/mnt/data/{project_name}.zip"
+with ZipFile(zip_path, 'w') as zipf:
+    for folder_name, subfolders, filenames in os.walk(project_name):
+        for filename in filenames:
+            file_path = os.path.join(folder_name, filename)
+            arcname = os.path.relpath(file_path, project_name)
+            zipf.write(file_path, arcname=arcname)
+
+zip_path
+
 # This workflow assumes you have already created the target Azure App Service web app.
 # For instructions see https://docs.microsoft.com/azure/app-service/app-service-plan-manage#create-an-app-service-plan
 #
